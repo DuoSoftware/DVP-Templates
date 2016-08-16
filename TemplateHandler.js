@@ -463,11 +463,10 @@ function  UpdateAllStyleContent(req,res)
 
     var updateArray= [];
 
-    /*styleData.forEach(function (styleItem) {
-        if(styleItem)
-        {
 
-            updateArray.push(function createContact (callback) {
+    styleData.forEach(function (styleItem) {
+        if (styleItem) {
+            updateArray.push(function createContact(callback) {
 
                 Template.findOneAndUpdate({_id:tempId,company:company,tenant:tenant,"styles._id":styleItem._id},{"$set":{
                     "styles.$.content":styleItem.content
@@ -490,60 +489,34 @@ function  UpdateAllStyleContent(req,res)
                         {
                             console.log("Success: "+resStyle);
                             callback(undefined,resStyle);
+
                         }
 
                     }
                 });
 
+
+
+
             });
         }
     });
 
-
-
-    async.parallel(styleData, function (err,res) {
-        console.log("Hit");
+    async.parallel(updateArray, function (err,allResp)
+    {
         if(err)
         {
-            console.log(err);
-            jsonString=messageFormatter.FormatMessage(err, "Styles searching failed", false, undefined);
+            jsonString=messageFormatter.FormatMessage(err, "No style updated", false, undefined);
             res.end(jsonString);
         }
         else
         {
-            console.log(res);
-            jsonString=messageFormatter.FormatMessage(undefined, "Styles searching succeeded", true, res);
+            jsonString=messageFormatter.FormatMessage(undefined, "styles updated successfully", true, allResp);
             res.end(jsonString);
         }
 
-    });*/
-
-
-    Template.findOneAndUpdate({_id:tempId,company:company,tenant:tenant,"styles._id":styleData[0]._id},{"$set":{
-        "styles.$.content":styleData[0].content
-
-    }}, function (errStyle,resStyle) {
-        if(errStyle)
-        {
-            console.log("Error in updating : "+errStyle);
-            res.end();
-        }
-        else
-        {
-            if(!resStyle)
-            {
-                console.log("Error in updating : "+new Error("No style found"));
-                jsonString=messageFormatter.FormatMessage(new Error("No style found"), "No style found", false, resStyle);
-
-            }
-            else
-            {
-                console.log("Success: "+resStyle);
-
-            }
-            res.end();
-        }
     });
+
 
 }
 
