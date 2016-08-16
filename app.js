@@ -13,6 +13,8 @@ var authorization = require('dvp-common/Authentication/Authorization.js');
 var port = config.Host.port || 3000;
 var version=config.Host.version;
 
+
+
 var RestServer = restify.createServer({
     name: "myapp",
     version: '1.0.0'
@@ -75,16 +77,18 @@ mongoose.connection.once('open', function() {
 mongoose.connect(connectionstring);
 
 
-RestServer.put('/DVP/API/'+version+'/RenderService/Template/:id/Styles',authorization({resource:"template", action:"write"}), TemplateHandler.AddTemplateStyles);
-RestServer.del('/DVP/API/'+version+'/RenderService/Template/:id/Style/:sid',authorization({resource:"template", action:"write"}), TemplateHandler.RemoveStyle);
+RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Styles',authorization({resource:"template", action:"write"}), TemplateHandler.AddTemplateStyles);
+RestServer.put('/DVP/API/'+version+'/RenderService/Template/:id/AllStyles',authorization({resource:"template", action:"write"}), TemplateHandler.UpdateAllStyleContent);
+RestServer.del('/DVP/API/'+version+'/RenderService/Template/:id/Style/:sid',authorization({resource:"template", action:"delete"}), TemplateHandler.RemoveStyle);
+RestServer.del('/DVP/API/'+version+'/RenderService/Template/:id/Styles',authorization({resource:"template", action:"delete"}), TemplateHandler.RemoveAllStyles);
 RestServer.put('/DVP/API/'+version+'/RenderService/Template/:id/Style/:sid',authorization({resource:"template", action:"write"}), TemplateHandler.UpdateStyleContent);
 RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Style',authorization({resource:"template", action:"write"}), TemplateHandler.AddStyleToTemplate);
 
-RestServer.post('/DVP/API/'+version+'/RenderService/Template',authorization({resource:"ticket", action:"write"}),TemplateHandler.CreateTemplate);
-RestServer.post('/DVP/API/'+version+'/RenderService/RenderTemplate/:template',authorization({resource:"ticket", action:"write"}),TemplateHandler.RenderTemplate);
+RestServer.post('/DVP/API/'+version+'/RenderService/Template',authorization({resource:"template", action:"write"}),TemplateHandler.CreateTemplate);
+RestServer.post('/DVP/API/'+version+'/RenderService/RenderTemplate/:template',authorization({resource:"template", action:"write"}),TemplateHandler.RenderTemplate);
 RestServer.get('/DVP/API/'+version+'/RenderService/Templates',authorization({resource:"template", action:"read"}),TemplateHandler.PickAllTemplates);
 RestServer.get('/DVP/API/'+version+'/RenderService/Template/:id',authorization({resource:"template", action:"read"}),TemplateHandler.PickTemplateById);
-RestServer.del('/DVP/API/'+version+'/RenderService/Template/:id',authorization({resource:"template", action:"write"}), TemplateHandler.RemoveTemplate);
+RestServer.del('/DVP/API/'+version+'/RenderService/Template/:template',authorization({resource:"template", action:"write"}), TemplateHandler.RemoveTemplate);
 RestServer.put('/DVP/API/'+version+'/RenderService/Template/:id',authorization({resource:"template", action:"write"}),TemplateHandler.UpdateTemplateContent);
 RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Content',authorization({resource:"template", action:"write"}),TemplateHandler.UpdateTemplateMainContent);
 

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.0.1",
     "config": "^1.21.0",
     "dustjs-linkedin": "^2.7.2",
     "dvp-common": "^0.1.3",

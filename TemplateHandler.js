@@ -7,6 +7,7 @@ var dust = require('dustjs-linkedin');
 var juice = require('juice');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var async= require('async');
 
 function CreateTemplate(req,res){
 
@@ -14,38 +15,75 @@ function CreateTemplate(req,res){
     var jsonString;
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
+    var fileType=req.body.FileType;
 
-    for(var i=0;i<req.body.StyleFiles.length;i++)
+
+    if(fileType=="html")
     {
-        styles.push({content:req.body.StyleFiles[i]});
-        if(i==req.body.StyleFiles.length-1)
+        for(var i=0;i<req.body.StyleFiles.length;i++)
         {
-            var TemplateObject = Template
-            ({
-                name      : req.body.TemplateName,
-                filetype : req.body.FileType,
-                content : {content:req.body.TemplateContent},
-                company: company,
-                tenant: tenant,
-                styles: styles
-            });
-
-            TemplateObject.save(function (errSave,resSave) {
-                if(errSave)
-                {
-                    jsonString=messageFormatter.FormatMessage(errSave, "Template saving failed", false, undefined);
-
-                }
-                else
-                {
-                    jsonString=messageFormatter.FormatMessage(undefined, "Template saving succeded", true, resSave);
-
-                }
-                res.end(jsonString);
-            });
+            styles.push({content:req.body.StyleFiles[i]});
         }
     }
 
+    var TemplateObject = Template
+    ({
+        name      : req.body.TemplateName,
+        filetype : req.body.FileType,
+        content : {content:req.body.TemplateContent},
+        company: company,
+        tenant: tenant,
+        styles: styles
+    });
+
+    TemplateObject.save(function (errSave,resSave) {
+        if(errSave)
+        {
+            jsonString=messageFormatter.FormatMessage(errSave, "Template saving failed", false, undefined);
+
+        }
+        else
+        {
+            jsonString=messageFormatter.FormatMessage(undefined, "Template saving succeded", true, resSave);
+
+        }
+        res.end(jsonString);
+    });
+
+
+
+
+    /*for(var i=0;i<req.body.StyleFiles.length;i++)
+     {
+
+     if(i==req.body.StyleFiles.length-1)
+     {
+     var TemplateObject = Template
+     ({
+     name      : req.body.TemplateName,
+     filetype : req.body.FileType,
+     content : {content:req.body.TemplateContent},
+     company: company,
+     tenant: tenant,
+     styles: styles
+     });
+
+     TemplateObject.save(function (errSave,resSave) {
+     if(errSave)
+     {
+     jsonString=messageFormatter.FormatMessage(errSave, "Template saving failed", false, undefined);
+
+     }
+     else
+     {
+     jsonString=messageFormatter.FormatMessage(undefined, "Template saving succeded", true, resSave);
+
+     }
+     res.end(jsonString);
+     });
+     }
+     }
+     */
 
 
 
@@ -81,6 +119,7 @@ function RenderTemplate (req,res)
     var jsonString;
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
+    console.log(req.body);
 
 
 
@@ -128,7 +167,7 @@ function RenderTemplate (req,res)
                                 if(i==(resPickTemp.styles.length-1))
                                 {
                                     //  jsonString=messageFormatter.FormatMessage(undefined, "Template rendering succeeded", true, renderedTemplate.toString());
-                                    console.log("Rendering Done");
+                                    console.log("HTML Rendering Done");
                                     res.end(renderedTemplate);
                                 }
 
@@ -136,9 +175,12 @@ function RenderTemplate (req,res)
                         }
                         else
                         {
-                            console.log("Rendering Done");
-                            jsonString=messageFormatter.FormatMessage(undefined, "No styles found", true, outRendered);
-                            res.end(jsonString);
+
+
+                            console.log(" Rendering Done");
+                            jsonString=messageFormatter.FormatMessage(undefined, "Rendering succeeded", true, outRendered);
+                            console.log(jsonString);
+                            res.end(outRendered);
                         }
 
                     }
@@ -225,7 +267,7 @@ function RemoveTemplate(req,res)
     var jsonString;
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
-    Template.findOneAndRemove({_id:req.params.id,company:company,tenant:tenant}, function (errRemove,resRemove) {
+    Template.findOneAndRemove({name:req.params.template,company:company,tenant:tenant}, function (errRemove,resRemove) {
 
         if(errRemove)
         {
@@ -411,6 +453,99 @@ function  UpdateStyleContent(req,res)
         }
     });
 }
+function  UpdateAllStyleContent(req,res)
+{
+    var jsonString;
+    var styleData=req.body.Styles;
+    var tempId=req.params.id;
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+
+    var updateArray= [];
+
+    /*styleData.forEach(function (styleItem) {
+        if(styleItem)
+        {
+
+            updateArray.push(function createContact (callback) {
+
+                Template.findOneAndUpdate({_id:tempId,company:company,tenant:tenant,"styles._id":styleItem._id},{"$set":{
+                    "styles.$.content":styleItem.content
+
+                }}, function (errStyle,resStyle) {
+                    if(errStyle)
+                    {
+                        console.log("Error in updating : "+errStyle);
+                        callback(errStyle,undefined);
+                    }
+                    else
+                    {
+                        if(!resStyle)
+                        {
+                            console.log("Error in updating : "+new Error("No style found"));
+                            jsonString=messageFormatter.FormatMessage(new Error("No style found"), "No style found", false, resStyle);
+                            callback(new Error("No style found"),undefined);
+                        }
+                        else
+                        {
+                            console.log("Success: "+resStyle);
+                            callback(undefined,resStyle);
+                        }
+
+                    }
+                });
+
+            });
+        }
+    });
+
+
+
+    async.parallel(styleData, function (err,res) {
+        console.log("Hit");
+        if(err)
+        {
+            console.log(err);
+            jsonString=messageFormatter.FormatMessage(err, "Styles searching failed", false, undefined);
+            res.end(jsonString);
+        }
+        else
+        {
+            console.log(res);
+            jsonString=messageFormatter.FormatMessage(undefined, "Styles searching succeeded", true, res);
+            res.end(jsonString);
+        }
+
+    });*/
+
+
+    Template.findOneAndUpdate({_id:tempId,company:company,tenant:tenant,"styles._id":styleData[0]._id},{"$set":{
+        "styles.$.content":styleData[0].content
+
+    }}, function (errStyle,resStyle) {
+        if(errStyle)
+        {
+            console.log("Error in updating : "+errStyle);
+            res.end();
+        }
+        else
+        {
+            if(!resStyle)
+            {
+                console.log("Error in updating : "+new Error("No style found"));
+                jsonString=messageFormatter.FormatMessage(new Error("No style found"), "No style found", false, resStyle);
+
+            }
+            else
+            {
+                console.log("Success: "+resStyle);
+
+            }
+            res.end();
+        }
+    });
+
+}
 
 function RemoveStyle (req,res)
 {
@@ -443,6 +578,36 @@ function RemoveStyle (req,res)
     });
 }
 
+function RemoveAllStyles (req,res)
+{
+    var jsonString;
+    var styleIds=req.body.styleIdArray;
+    var tempId=req.params.id;
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+
+    Template.update({_id:tempId,company:company,tenant:tenant},{
+        $pullAll:
+        {
+            styles:{
+                _id:styleIds
+            }
+
+        }}, function (errRemove,resRemove) {
+
+        if(errRemove)
+        {
+            jsonString=messageFormatter.FormatMessage(errRemove, "Styles deletion failed", false, undefined);
+            res.end(jsonString);
+        }
+        else
+        {
+            jsonString=messageFormatter.FormatMessage(undefined, "Styles deletion succeeded", true, resRemove);
+            res.end(jsonString);
+        }
+
+    });
+}
 function AddStyleToTemplate(req,res)
 {
     var jsonString;
@@ -478,3 +643,5 @@ module.exports.UpdateStyleContent = UpdateStyleContent;
 module.exports.RemoveStyle = RemoveStyle;
 module.exports.PickAllTemplates = PickAllTemplates;
 module.exports.AddStyleToTemplate = AddStyleToTemplate;
+module.exports.RemoveAllStyles = RemoveAllStyles;
+module.exports.UpdateAllStyleContent = UpdateAllStyleContent;
