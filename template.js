@@ -7,7 +7,7 @@ var Schema = mongoose.Schema;
 
 var fileSchema = mongoose.Schema(
     {
-
+        subject: { type: String},
         content : { type: String}
 
     }
