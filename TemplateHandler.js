@@ -30,7 +30,7 @@ function CreateTemplate(req,res){
     ({
         name      : req.body.TemplateName,
         filetype : req.body.FileType,
-        content : {content:req.body.TemplateContent},
+        content : {content:req.body.TemplateContent,subject:req.body.TemplateSubject},
         company: company,
         tenant: tenant,
         styles: styles
