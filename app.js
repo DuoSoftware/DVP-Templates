@@ -62,6 +62,8 @@ var mongoose = require('mongoose');
 var connectionstring = '';
 mongoip = mongoip.split(',');
 if(util.isArray(mongoip)){
+    
+     if(mongoip.length > 1){    
 
     mongoip.forEach(function(item){
         connectionstring += util.format('%s:%d,',item,mongoport)
@@ -74,12 +76,17 @@ if(util.isArray(mongoip)){
         connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
         console.log("connectionstring ...   "+connectionstring);
     }
+     }
+    else
+    {
+         connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodbase);
+    }
 }else{
 
     connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodbase);
-    console.log("connectionstring ...   "+connectionstring);
+    
 }
-
+console.log("connectionstring ...   "+connectionstring);
 
 mongoose.connection.on('error', function (err) {
     throw new Error(err);
