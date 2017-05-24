@@ -9,6 +9,7 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var async= require('async');
 
+
 function CreateTemplate(req,res){
 
     var styles=[];
@@ -238,6 +239,7 @@ function PickTemplate(template,company,tenant,callback)
 }
 function PickAllTemplates(req,res)
 {
+    logger.debug("DVP-LiteTicket.PickAllTemplates Internal method ");
     var jsonString;
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);

@@ -37,7 +37,7 @@ module.exports = {
         "vdomain": "localhost",
         "domain": "localhost",
         "port": "3638",
-        "version": "1.0"
+        "version": "1.0.0.0"
     },
 
     "LBServer" : {
@@ -50,13 +50,15 @@ module.exports = {
 
     "Mongo":
     {
-        "ip":"45.55.142.207",
+        "ip":"104.236.231.11",
         "port":"27017",
         "dbname":"dvpdb",
         "password":"DuoS123",
         "user":"duo",
         "replicaset" :"104.236.231.11"
-    }/*,
+    }
+
+    /*,
 
     "Services" : {
         "accessToken":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdWtpdGhhIiwianRpIjoiMTdmZTE4M2QtM2QyNC00NjQwLTg1NTgtNWFkNGQ5YzVlMzE1Iiwic3ViIjoiNTZhOWU3NTlmYjA3MTkwN2EwMDAwMDAxMjVkOWU4MGI1YzdjNGY5ODQ2NmY5MjExNzk2ZWJmNDMiLCJleHAiOjE4OTMzMDI3NTMsInRlbmFudCI6LTEsImNvbXBhbnkiOi0xLCJzY29wZSI6W3sicmVzb3VyY2UiOiJhbGwiLCJhY3Rpb25zIjoiYWxsIn1dLCJpYXQiOjE0NjEyOTkxNTN9.YiocvxO_cVDzH5r67-ulcDdBkjjJJDir2AeSe3jGYeA",

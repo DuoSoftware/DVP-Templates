@@ -3,7 +3,6 @@
  */
 var dusty = require('dustjs-linkedin');
 var juice = require('juice');
-var TemplateHandler = require('./TemplateHandler.js');
 var config= require('config');
 var util=require('util');
 var restify = require('restify');
@@ -12,8 +11,12 @@ var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
 var port = config.Host.port || 3000;
 var version=config.Host.version;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
 
-
+var TemplateHandler = require('./TemplateHandler.js');
+var ChatTemplateHandler = require('./ChatTemplateHandler.js');
 
 var RestServer = restify.createServer({
     name: "myapp",
@@ -49,59 +52,92 @@ RestServer.use(restify.queryParser());
 dusty.config.whitespace = true;
 
 
+var util = require('util');
 var mongoip=config.Mongo.ip;
 var mongoport=config.Mongo.port;
 var mongodb=config.Mongo.dbname;
 var mongouser=config.Mongo.user;
 var mongopass = config.Mongo.password;
-var mongoreplicaset=config.Mongo.replicaset;
+var mongoreplicaset= config.Mongo.replicaset;
 
-
-
-var mongoose = require('mongoose');
 var connectionstring = '';
+
+console.log(mongoip);
+
 mongoip = mongoip.split(',');
+
+console.log(mongoip);
+
 if(util.isArray(mongoip)){
-    
-     if(mongoip.length > 1){    
 
-    mongoip.forEach(function(item){
-        connectionstring += util.format('%s:%d,',item,mongoport)
-    });
+    if(mongoip.length > 1){
 
-    connectionstring = connectionstring.substring(0, connectionstring.length - 1);
-    connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
+        mongoip.forEach(function(item){
+            connectionstring += util.format('%s:%d,',item,mongoport)
+        });
 
-    if(mongoreplicaset){
-        connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
-        console.log("connectionstring ...   "+connectionstring);
+        connectionstring = connectionstring.substring(0, connectionstring.length - 1);
+        connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
+
+        if(mongoreplicaset){
+            connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
+        }
+    }else{
+
+        connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb)
     }
-     }
-    else
-    {
-         connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
-    }
+
 }else{
 
-    connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodb);
-    
+    connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodb)
 }
-console.log("connectionstring ...   "+connectionstring);
+
+console.log(connectionstring);
+
+mongoose.connect(connectionstring,{server:{auto_reconnect:true}});
+
 
 mongoose.connection.on('error', function (err) {
-    throw new Error(err);
+    console.error( new Error(err));
+    mongoose.disconnect();
+
 });
 
+mongoose.connection.on('opening', function() {
+    console.log("reconnecting... %d", mongoose.connection.readyState);
+});
+
+
 mongoose.connection.on('disconnected', function() {
-    throw new Error('Could not connect to database');
+    console.error( new Error('Could not connect to database'));
+    mongoose.connect(connectionstring,{server:{auto_reconnect:true}});
 });
 
 mongoose.connection.once('open', function() {
     console.log("Connected to db");
+
 });
 
 
-mongoose.connect(connectionstring);
+mongoose.connection.on('reconnected', function () {
+    console.log('MongoDB reconnected!');
+});
+
+
+
+process.on('SIGINT', function() {
+    mongoose.connection.close(function () {
+        console.log('Mongoose default connection disconnected through app termination');
+        process.exit(0);
+    });
+});
+
+
+
+
+
+
+
 
 
 RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Styles',authorization({resource:"template", action:"write"}), TemplateHandler.AddTemplateStyles);
@@ -113,9 +149,17 @@ RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Style',authoriz
 
 RestServer.post('/DVP/API/'+version+'/RenderService/Template',authorization({resource:"template", action:"write"}),TemplateHandler.CreateTemplate);
 RestServer.post('/DVP/API/'+version+'/RenderService/RenderTemplate/:template',authorization({resource:"template", action:"write"}),TemplateHandler.RenderTemplate);
-RestServer.get('/DVP/API/'+version+'/RenderService/Templates',authorization({resource:"template", action:"read"}),TemplateHandler.PickAllTemplates);
+RestServer.get('/DVP/API/'+version+'/RenderService/Templates',authorization({resource:"ticket", action:"read"}),TemplateHandler.PickAllTemplates);
 RestServer.get('/DVP/API/'+version+'/RenderService/Template/:id',authorization({resource:"template", action:"read"}),TemplateHandler.PickTemplateById);
 RestServer.del('/DVP/API/'+version+'/RenderService/Template/:template',authorization({resource:"template", action:"write"}), TemplateHandler.RemoveTemplate);
 RestServer.put('/DVP/API/'+version+'/RenderService/Template/:id',authorization({resource:"template", action:"write"}),TemplateHandler.UpdateTemplateContent);
 RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Content',authorization({resource:"template", action:"write"}),TemplateHandler.UpdateTemplateMainContent);
+
+
+RestServer.post('/DVP/API/'+version+'/TemplateService/ChatTemplate',authorization({resource:"template", action:"write"}),ChatTemplateHandler.CreateChatTemplate);
+RestServer.get('/DVP/API/'+version+'/TemplateService/AvailableChatTemplates',authorization({resource:"template", action:"read"}),ChatTemplateHandler.PickAvailableChatTemplates);
+RestServer.get('/DVP/API/'+version+'/TemplateService/ChatTemplates',authorization({resource:"template", action:"read"}),ChatTemplateHandler.PickAllChatTemplates);
+RestServer.get('/DVP/API/'+version+'/TemplateService/MyChatTemplates',authorization({resource:"template", action:"read"}),ChatTemplateHandler.PickMyChatTemplates);
+RestServer.put('/DVP/API/'+version+'/TemplateService/ChatTemplate/:id',authorization({resource:"template", action:"write"}),ChatTemplateHandler.UpdateChatTemplate);
+RestServer.del('/DVP/API/'+version+'/TemplateService/ChatTemplate/:id',authorization({resource:"template", action:"delete"}),ChatTemplateHandler.DeleteChatTemplate);
 
