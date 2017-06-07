@@ -154,6 +154,7 @@ RestServer.get('/DVP/API/'+version+'/RenderService/Template/:id',authorization({
 RestServer.del('/DVP/API/'+version+'/RenderService/Template/:template',authorization({resource:"template", action:"write"}), TemplateHandler.RemoveTemplate);
 RestServer.put('/DVP/API/'+version+'/RenderService/Template/:id',authorization({resource:"template", action:"write"}),TemplateHandler.UpdateTemplateContent);
 RestServer.post('/DVP/API/'+version+'/RenderService/Template/:id/Content',authorization({resource:"template", action:"write"}),TemplateHandler.UpdateTemplateMainContent);
+RestServer.get('/DVP/API/'+version+'/RenderService/TemplateByType/:filetype',authorization({resource:"template", action:"write"}),TemplateHandler.PickAllTemplates);
 
 
 RestServer.post('/DVP/API/'+version+'/TemplateService/ChatTemplate',authorization({resource:"template", action:"write"}),ChatTemplateHandler.CreateChatTemplate);

@@ -264,6 +264,33 @@ function PickAllTemplates(req,res)
         res.end(jsonString)
     });
 }
+function PickTemplatesByFileType(req,res)
+{
+    logger.debug("DVP-LiteTicket.PickTemplatesByFileType Internal method ");
+    var jsonString;
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+    Template.find({company:company,tenant:tenant,filetype:req.params.filetype},function (errPickTemplate,resPickTemplate) {
+
+        if(errPickTemplate)
+        {
+            jsonString=messageFormatter.FormatMessage(errPickTemplate, "Template picking failed", false, undefined);
+        }
+        else
+        {
+            if(resPickTemplate.length>0)
+            {
+                jsonString=messageFormatter.FormatMessage(undefined, "Template picking succeeded", true, resPickTemplate);
+            }
+            else
+            {
+                jsonString=messageFormatter.FormatMessage(new Error("No template found"), "No template found", false, undefined);
+            }
+
+        }
+        res.end(jsonString)
+    });
+}
 function RemoveTemplate(req,res)
 {
     var jsonString;
@@ -620,3 +647,4 @@ module.exports.PickAllTemplates = PickAllTemplates;
 module.exports.AddStyleToTemplate = AddStyleToTemplate;
 module.exports.RemoveAllStyles = RemoveAllStyles;
 module.exports.UpdateAllStyleContent = UpdateAllStyleContent;
+module.exports.PickTemplatesByFileType = PickTemplatesByFileType;
