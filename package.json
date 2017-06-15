@@ -13,8 +13,9 @@
     "config": "^1.21.0",
     "dustjs-linkedin": "^2.7.2",
     "dvp-common": "^0.1.3",
+    "dvp-mongomodels": "^4.8.7",
     "juice": "^2.0.0",
-    "mongoose": "^4.5.4",
+    "mongoose": "^4.10.2",
     "restify": "^4.1.1",
     "restify-jwt": "^0.4.0",
     "util": "^0.10.3"
