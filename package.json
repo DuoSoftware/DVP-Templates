@@ -12,7 +12,7 @@
     "async": "^2.0.1",
     "config": "^1.21.0",
     "dustjs-linkedin": "^2.7.2",
-    "dvp-common": "^0.8.4",
+    "dvp-common": "^1.1.0",
     "dvp-mongomodels": "^4.8.7",
     "juice": "^2.0.0",
     "mongoose": "^4.10.2",
