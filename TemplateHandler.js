@@ -331,6 +331,10 @@ function UpdateTemplateContent(req,res)
                 {
                     resTemp.content={content:req.body.TemplateContent};
                 }
+                if(req.body.TemplateSubject)
+                {
+                    resTemp.content.subject=req.body.TemplateSubject;
+                }
 
                 if(req.body.FileType)
                 {
