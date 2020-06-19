@@ -49,13 +49,14 @@ module.exports = {
     ip: "localhost",
     port: "3434",
   },
+  //mongodb+srv://facetone:Hds7236YD@facetone-prod.2xyao.mongodb.net/dvpdb
 
   Mongo: {
-    ip: "",
+    ip: "facetone-prod.2xyao.mongodb.net",
     port: "",
-    dbname: "",
-    password: "",
-    user: "",
+    dbname: "dvpdb",
+    password: "Hds7236YD",
+    user: "facetone",
     replicaset: "",
     type: "mongodb+srv",
   },
