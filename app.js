@@ -2,18 +2,13 @@
  * Created by Pawan on 7/12/2016.
  */
 var dusty = require("dustjs-linkedin");
-var juice = require("juice");
 var config = require("config");
-var util = require("util");
 var restify = require("restify");
 var jwt = require("restify-jwt");
 var secret = require("dvp-common-lite/Authentication/Secret.js");
 var authorization = require("dvp-common-lite/Authentication/Authorization.js");
 var port = config.Host.port || 3000;
 var version = config.Host.version;
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
 
 var TemplateHandler = require("./TemplateHandler.js");
 var ChatTemplateHandler = require("./ChatTemplateHandler.js");
@@ -46,142 +41,6 @@ RestServer.use(restify.queryParser());
 dusty.config.whitespace = true;
 
 var util = require("util");
-var mongoip = config.Mongo.ip;
-var mongoport = config.Mongo.port;
-var mongodb = config.Mongo.dbname;
-var mongouser = config.Mongo.user;
-var mongopass = config.Mongo.password;
-var mongoreplicaset = config.Mongo.replicaset;
-var mongotype = config.Mongo.type;
-
-var connectionstring = "";
-
-console.log(mongoip);
-
-mongoip = mongoip.split(",");
-
-console.log(mongoip);
-
-if (util.isArray(mongoip)) {
-  if (mongoip.length > 1) {
-    mongoip.forEach(function (item) {
-      connectionstring +=
-        mongoport == ""
-          ? util.format("%s,", item)
-          : util.format("%s:%d,", item, mongoport);
-    });
-
-    connectionstring = connectionstring.substring(
-      0,
-      connectionstring.length - 1
-    );
-    connectionstring = util.format(
-      "%s://%s:%s@%s/%s",
-      mongotype,
-      mongouser,
-      mongopass,
-      connectionstring,
-      mongodb
-    );
-
-    if (mongoreplicaset) {
-      connectionstring = util.format(
-        "%s?replicaSet=%s",
-        connectionstring,
-        mongoreplicaset
-      );
-    }
-  } else {
-    connectionstring =
-      mongoport == ""
-        ? util.format(
-            "%s://%s:%s@%s/%s",
-            mongotype,
-            mongouser,
-            mongopass,
-            mongoip[0],
-            mongodb
-          )
-        : util.format(
-            "%s://%s:%s@%s:%d/%s",
-            mongotype,
-            mongouser,
-            mongopass,
-            mongoip[0],
-            mongoport,
-            mongodb
-          );
-  }
-} else {
-  connectionstring =
-    mongoport == ""
-      ? util.format(
-          "%s://%s:%s@%s/%s",
-          mongotype,
-          mongouser,
-          mongopass,
-          mongoip,
-          mongodb
-        )
-      : util.format(
-          "%s://%s:%s@%s:%d/%s",
-          mongotype,
-          mongouser,
-          mongopass,
-          mongoip,
-          mongoport,
-          mongodb
-        );
-}
-
-console.log(connectionstring);
-var options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-};
-
-mongoose
-  .connect(connectionstring, /*{server:{auto_reconnect:true}}*/ options)
-  .catch((err) => {
-    console.error(new Error(err));
-  });
-
-mongoose.connection.on("error", function (err) {
-  console.error(new Error(err));
-  //mongoose.disconnect();
-});
-
-mongoose.connection.on("opening", function () {
-  console.log("reconnecting... %d", mongoose.connection.readyState);
-});
-
-mongoose.connection.on("disconnected", function () {
-  console.error(new Error("Could not connect to mongo database"));
-  //mongoose.connect(connectionstring,{server:{auto_reconnect:true}});
-});
-
-mongoose.connection.on("open", function () {
-  console.log("Connected to db");
-});
-
-mongoose.connection.on("reconnected", function () {
-  console.log("MongoDB reconnected!");
-});
-
-mongoose.connection.on("reconnectFailed", function () {
-  console.log("MongoDB reconnect failed!");
-});
-
-process.on("SIGINT", function () {
-  mongoose.connection.close(function () {
-    console.log(
-      "Mongoose default connection disconnected through app termination"
-    );
-    process.exit(0);
-  });
-});
-
 RestServer.post(
   "/DVP/API/" + version + "/RenderService/Template/:id/Styles",
   authorization({ resource: "template", action: "write" }),
