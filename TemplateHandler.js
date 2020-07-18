@@ -2,7 +2,7 @@
  * Created by Pawan on 7/13/2016.
  */
 
-var Template = require("dvp-mongomodels/model/Template");
+var Template = require("dvp-mongomodels/model/Template").Template;
 var dust = require("dustjs-linkedin");
 var juice = require("juice");
 var logger = require("dvp-common-lite/LogHandler/CommonLogHandler.js").logger;

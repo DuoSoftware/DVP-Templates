@@ -6,7 +6,7 @@ var ChatTemplate = require("dvp-mongomodels/model/ChatTemplates").ChatTemplate;
 var User = require("dvp-mongomodels/model/User");
 var logger = require("dvp-common-lite/LogHandler/CommonLogHandler.js").logger;
 var messageFormatter = require("dvp-common-lite/CommonMessageGenerator/ClientMessageJsonFormatter.js");
-var Template = require("dvp-mongomodels/model/Template");
+var Template = require("dvp-mongomodels/model/Template").Template;
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 mongoose.set("debug", true);
