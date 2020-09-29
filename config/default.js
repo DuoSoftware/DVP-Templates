@@ -58,6 +58,6 @@ module.exports = {
     password: "Hds7236YD",
     user: "facetone",
     replicaset: "",
-    type: "mongodb+srv",
+    type: "mongodb",
   },
 };
