@@ -9,7 +9,7 @@ var secret = require("dvp-common-lite/Authentication/Secret.js");
 var authorization = require("dvp-common-lite/Authentication/Authorization.js");
 var port = config.Host.port || 3000;
 var version = config.Host.version;
-
+var mongomodels = require("dvp-mongomodels");
 var TemplateHandler = require("./TemplateHandler.js");
 var ChatTemplateHandler = require("./ChatTemplateHandler.js");
 
