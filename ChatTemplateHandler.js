@@ -1,15 +1,15 @@
 /**
  * Created by Pawan on 5/23/2017.
  */
-var mongoose = require("mongoose");
+//var mongoose = require("mongoose");
 var ChatTemplate = require("dvp-mongomodels/model/ChatTemplates").ChatTemplate;
 var User = require("dvp-mongomodels/model/User");
 var logger = require("dvp-common-lite/LogHandler/CommonLogHandler.js").logger;
 var messageFormatter = require("dvp-common-lite/CommonMessageGenerator/ClientMessageJsonFormatter.js");
 var Template = require("dvp-mongomodels/model/Template").Template;
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
-mongoose.set("debug", true);
+//var Schema = mongoose.Schema;
+//var ObjectId = Schema.ObjectId;
+//mongoose.set("debug", true);
 
 function CreateChatTemplate(req, res) {
   logger.debug("DVP-LiteTicket.CreateTagCategory Internal method ");
